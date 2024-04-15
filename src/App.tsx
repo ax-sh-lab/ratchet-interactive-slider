@@ -1,13 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-
-function App() {
+function Slider({ onChange }: { onChange: (value: number) => void }) {
   useEffect(() => {
     const slider = document.querySelector<HTMLDivElement>('.slider');
     const handle = document.querySelector<HTMLDivElement>('.slider-handle');
-    const measure = document.querySelector<HTMLDivElement>('.measure');
     if (!slider) return;
     if (!handle) return;
 
@@ -21,7 +17,7 @@ function App() {
     function updateMeasure() {
       const percent = (handle.offsetLeft / (sliderWidth - handleWidth)) * 100;
       const position = Math.round((percent / 100) * intervals);
-      measure.textContent = position;
+      onChange(position);
       handle.style.left = position * intervalWidth + 'px';
     }
 
@@ -29,13 +25,14 @@ function App() {
     let isDragging = false;
     let startX: number;
     let startLeft: number;
+
     handle.addEventListener('mousedown', (e) => {
       isDragging = true;
       startX = e.clientX;
       startLeft = handle.offsetLeft;
     });
 
-    handle.addEventListener('mousemove', (e) => {
+    document.addEventListener('mousemove', (e) => {
       if (isDragging) {
         const deltaX = e.clientX - startX;
         const newLeft = startLeft + deltaX;
@@ -46,18 +43,74 @@ function App() {
       updateMeasure();
     });
 
-    handle.addEventListener('mouseup', () => {
+    document.addEventListener('mouseup', () => {
       isDragging = false;
     });
   }, []);
 
   return (
+    <div className='slider'>
+      <div className='slider-handle'></div>
+    </div>
+  );
+}
+
+function Slidera({ onChange }: { onChange: (value: number) => void }) {
+  const [position, setPosition] = useState(0);
+
+  // Calculate slider properties whenever position changes
+  useEffect(() => {
+    const intervals = 10; // Number of intervals on the slider
+    const intervalWidth = (100 - (1 / intervals) * 100) / intervals; // Adjust for handle width
+
+    // Update measure whenever position changes
+    onChange(position);
+  }, [position, onChange]);
+
+  // Handle mouse down event for dragging the handle
+  const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const startX = e.clientX;
+    const startLeft = e.currentTarget.offsetLeft;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const deltaX = e.clientX - startX;
+      const newLeft = startLeft + deltaX;
+
+      // Update position within slider bounds
+      if (newLeft >= 0 && newLeft <= 100) {
+        const newPosition = Math.round((newLeft / 100) * 10); // 10 intervals
+        setPosition(newPosition);
+      }
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, []);
+
+  return (
+    <div className='slider'>
+      <div
+        style={{ left: `${(position / 10) * 100}%` }} // Set handle position dynamically
+        onMouseDown={handleMouseDown}
+        className='slider-handle'
+      ></div>
+    </div>
+  );
+}
+
+function App() {
+  const [value, setValue] = useState('');
+  return (
     <main className={'container m-auto'}>
       <div className={'h-32'}></div>
-      <div className='slider'>
-        <div className='slider-handle'></div>
-      </div>
-      <div className='measure'>0</div>
+      {/*<Slider onChange={setValue} />*/}
+      <Slidera onChange={setValue} />
+      <div className='measure'>{value}</div>
     </main>
   );
 }
