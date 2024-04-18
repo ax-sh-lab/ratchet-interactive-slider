@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { DraggableComponent } from './SnapToSibling.tsx';
-import { Slider } from './slider.tsx';
+import { RatchetSlider } from './ratchetSlider.tsx';
 
 function Slidera({ onChange }: { onChange: (value: number) => void }) {
   const [position, setPosition] = useState(0);
@@ -58,7 +58,7 @@ function App() {
     <main className={'container m-auto'}>
       <div className={'h-32'}></div>
       <div className='measure'>{value}</div>
-      <Slider onChange={setValue} />
+      <RatchetSlider onChange={setValue} />
       {/*<Slidera onChange={setValue} />*/}
 
       {/*<DraggableComponenta />*/}

@@ -1,7 +1,9 @@
 import { Dispatch, ElementRef, SetStateAction, useEffect, useRef } from 'react';
 
-export function Slider({ onChange }: { onChange: Dispatch<SetStateAction<string>> }) {
+export function RatchetSlider({ onChange }: { onChange: Dispatch<SetStateAction<string>> }) {
   const sliderRef = useRef<ElementRef<'div'>>(null);
+  // Event listeners for dragging the handle
+  const stateRef = useRef({ isDragging: false, startX: 0, startLeft: 0 });
 
   useEffect(() => {
     const slider = sliderRef.current;
@@ -24,21 +26,17 @@ export function Slider({ onChange }: { onChange: Dispatch<SetStateAction<string>
       handle.style.left = position * intervalWidth + 'px';
     }
 
-    // Event listeners for dragging the handle
-    let isDragging = false;
-    let startX: number;
-    let startLeft: number;
-
     handle.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      startX = e.clientX;
-      startLeft = handle.offsetLeft;
+      stateRef.current.isDragging = true;
+      stateRef.current.startX = e.clientX;
+      stateRef.current.startLeft = handle.offsetLeft;
     });
 
     document.addEventListener('mousemove', (e) => {
-      if (isDragging) {
-        const deltaX = e.clientX - startX;
-        const newLeft = startLeft + deltaX;
+      const state = stateRef.current;
+      if (state.isDragging) {
+        const deltaX = e.clientX - state.startX;
+        const newLeft = state.startLeft + deltaX;
         if (newLeft >= 0 && newLeft <= sliderWidth - handleWidth) {
           handle.style.left = newLeft + 'px';
         }
@@ -47,7 +45,7 @@ export function Slider({ onChange }: { onChange: Dispatch<SetStateAction<string>
     });
 
     document.addEventListener('mouseup', () => {
-      isDragging = false;
+      stateRef.current.isDragging = false;
     });
   }, [onChange]);
 
