@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { DraggableComponent } from './SnapToSibling.tsx';
-import { RatchetSlider } from './ratchetSlider.tsx';
+import { RatchetSlider } from './ratchet-slider.tsx';
 
 function Slidera({ onChange }: { onChange: (value: number) => void }) {
   const [position, setPosition] = useState(0);
